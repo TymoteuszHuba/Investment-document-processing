@@ -53,4 +53,4 @@ uploads/
 temp/
 data/
 *.pdf
-!samples/xtb_synthetic_sample.pdf
+!samples/xtb_statement_sample.pdf

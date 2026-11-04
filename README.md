@@ -6,7 +6,7 @@ A **Privacy-First Intelligent Document Processing (IDP)** microservice built wit
 
 ## 🎯 Key Features
 
-- **Privacy-First (Local PII Masking):** Personally Identifiable Information (name, address, tax ID/PESEL, account numbers) is masked locally before any payload is sent to cloud LLMs.
+- **Privacy-First (Local PII Masking):** Personally Identifiable Information (name, address, tax ID/PESEL, bank account numbers) is masked locally before any payload is sent to cloud LLMs.
 - **Resilient to Layout Variations (LLM-Powered):** Converts complex, multi-page financial statements into structured JSON using Google Gemini Pro with native Structured Outputs (JSON Schema), avoiding brittle regex table parsers.
 - **Strict Mathematical Validation:** Ensures numerical consistency using Pydantic and `Decimal` arithmetic (e.g., $\text{volume} \times \text{unit\_price} \pm \text{fees} = \text{total\_value}$).
 - **Data Pipeline Ready:** Clear REST API contract optimized for orchestration in Apache Airflow, storage in PostgreSQL, and analytics in Apache Superset.
@@ -22,6 +22,22 @@ flowchart LR
     C --> D["Gemini Pro: Structured JSON"]
     D --> E["Pydantic: Hard Math & Schema Validation"]
     E --> F["Normalized JSON / Database / BI"]
+```
+
+---
+
+## 📁 Repository Structure
+
+```text
+broker-statement-idp/
+├── samples/
+│   ├── generate_xtb_sample.py    # Generates synthetic bilingual XTB statement PDF
+│   ├── inspect_raw_text.py       # Extracts raw text and layout blocks using PyMuPDF
+│   └── xtb_statement_sample.pdf  # Generated reference sample statement
+├── .env.example                  # Environment configuration template
+├── .gitignore                    # Strict Git ignore rules for PII and secrets
+├── requirements.txt              # Production and development dependencies
+└── README.md                     # Project documentation
 ```
 
 ---
@@ -48,13 +64,25 @@ cp .env.example .env
 # Add your GEMINI_API_KEY inside .env
 ```
 
-### 3. Running the Development Server
+---
+
+## 🧪 Testing & Samples
+
+### Generate a Synthetic XTB Statement
+To create an authentic, bilingual (PL/EN) synthetic broker statement with mock PII and realistic stock transactions:
 
 ```bash
-uvicorn app.main:app --reload --port 8000
+python samples/generate_xtb_sample.py
 ```
 
-Interactive OpenAPI documentation will be available at: `http://localhost:8000/docs`.
+### Inspect Raw Text Extracted by PyMuPDF
+To verify the raw text blocks and layout parsed by the PDF engine:
+
+```bash
+python samples/inspect_raw_text.py
+# Or inspect an external file:
+# python samples/inspect_raw_text.py path/to/statement.pdf
+```
 
 ---
 
