@@ -5,18 +5,19 @@ of XTB periodic statements (account details with PII, closed positions, cash ope
 """
 
 from pathlib import Path
-from reportlab.lib.pagesizes import A4
+
 from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
-    SimpleDocTemplate,
     Paragraph,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    HRFlowable,
 )
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
 
 def generate_xtb_sample_pdf(output_path: Path):
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -31,15 +32,6 @@ def generate_xtb_sample_pdf(output_path: Path):
     )
     
     styles = getSampleStyleSheet()
-    
-    title_style = ParagraphStyle(
-        "DocTitle",
-        parent=styles["Normal"],
-        fontName="Helvetica-Bold",
-        fontSize=13,
-        leading=16,
-        textColor=colors.HexColor("#0D2237"),
-    )
     
     section_style = ParagraphStyle(
         "SectionHeader",
