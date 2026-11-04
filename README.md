@@ -6,7 +6,7 @@ A **Privacy-First Intelligent Document Processing (IDP)** microservice built wit
 
 ## 🎯 Key Features
 
-- **Privacy-First (Local PII Masking):** Personally Identifiable Information (name, address, tax ID/PESEL, bank account numbers) is masked locally before any payload is sent to cloud LLMs.
+- **Privacy-First (Local PII Masking):** Personally Identifiable Information (name, address, tax ID/PESEL, bank account numbers, broker account logins) is masked locally before any payload is sent to cloud LLMs.
 - **Resilient to Layout Variations (LLM-Powered):** Converts complex, multi-page financial statements into structured JSON using Google Gemini Pro with native Structured Outputs (JSON Schema), avoiding brittle regex table parsers.
 - **Strict Mathematical Validation:** Ensures numerical consistency using Pydantic and `Decimal` arithmetic (e.g., $\text{volume} \times \text{unit\_price} \pm \text{fees} = \text{total\_value}$).
 - **Data Pipeline Ready:** Clear REST API contract optimized for orchestration in Apache Airflow, storage in PostgreSQL, and analytics in Apache Superset.
@@ -30,10 +30,23 @@ flowchart LR
 
 ```text
 broker-statement-idp/
+├── app/
+│   ├── core/
+│   │   ├── __init__.py
+│   │   └── config.py              # Pydantic-settings configuration (.env loader)
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── pdf_parser.py          # PyMuPDF-based text ingestion service
+│   │   └── pii_anonymizer.py      # Privacy-First regex PII masking engine
+│   └── __init__.py
 ├── samples/
 │   ├── generate_xtb_sample.py    # Generates synthetic bilingual XTB statement PDF
 │   ├── inspect_raw_text.py       # Extracts raw text and layout blocks using PyMuPDF
 │   └── xtb_statement_sample.pdf  # Generated reference sample statement
+├── tests/
+│   ├── __init__.py
+│   ├── test_pdf_parser.py        # Unit tests for PDF extraction & byte handling
+│   └── test_pii_anonymizer.py    # Unit tests for PII masking & financial data preservation
 ├── .env.example                  # Environment configuration template
 ├── .gitignore                    # Strict Git ignore rules for PII and secrets
 ├── requirements.txt              # Production and development dependencies
@@ -64,6 +77,16 @@ cp .env.example .env
 # Add your GEMINI_API_KEY inside .env
 ```
 
+### 3. Running Automated Tests
+
+```bash
+# Run test suite with pytest
+pytest -v
+
+# Run code style & linting checks
+ruff check .
+```
+
 ---
 
 ## 🧪 Testing & Samples
@@ -91,4 +114,4 @@ python samples/inspect_raw_text.py
 This system is built from the ground up to respect financial data privacy:
 - The `.env` file containing secrets is strictly excluded from version control via `.gitignore`.
 - Raw user statements (PDFs) are never committed to the repository.
-- Local regex-based PII masking prevents sensitive identity details from leaving the host machine.
+- Local regex-based PII masking prevents sensitive identity details (names, addresses, PESEL/tax IDs, account IDs, and bank IBANs) from leaving the host machine.
